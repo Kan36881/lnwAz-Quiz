@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lnwZa Quiz: TPAT3 Sci & Tech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #082f49);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #f8fafc;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Particle Background Effect --- */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: floatParticle infinite linear;
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 20px rgba(99, 102, 241, 0.2);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .choice-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(71, 85, 105, 0.5);
+            background: rgba(30, 41, 59, 0.6);
+        }
+        
+        .choice-btn:hover:not(:disabled) {
+            border-color: #6366f1;
+            background-color: rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .choice-btn.selected {
+            border-color: #4f46e5;
+            background-color: #3730a3;
+            color: white;
+            transform: translateY(0);
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.5);
+        }
+
+        /* --- Transitions --- */
+        .fade-enter {
+            animation: fadeInRight 0.5s forwards;
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* --- Animations for Explanations --- */
+        .anim-container {
+            width: 120px; height: 120px; position: relative; margin: 0 auto 1rem auto;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* 1. Waves */
+        .wave { position: absolute; width: 20px; height: 20px; background-color: #3b82f6; border-radius: 50%; animation: wave-anim 2s infinite ease-out; }
+        .wave:nth-child(2) { animation-delay: 0.6s; }
+        .wave:nth-child(3) { animation-delay: 1.2s; }
+        @keyframes wave-anim { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(5); opacity: 0; } }
+
+        /* 2. Battery */
+        .battery-body { width: 60px; height: 100px; border: 4px solid #fff; border-radius: 8px; position: relative; display: flex; align-items: flex-end; padding: 4px; }
+        .battery-body::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 6px; background: #fff; border-radius: 4px 4px 0 0; }
+        .battery-fill { width: 100%; background-color: #10b981; border-radius: 2px; animation: battery-anim 3s infinite; }
+        @keyframes battery-anim { 0% { height: 0%; background-color: #ef4444; } 50% { background-color: #eab308; } 100% { height: 100%; background-color: #10b981; } }
+
+        /* 3. Orbit */
+        .orbit-center { width: 30px; height: 30px; background: #eab308; border-radius: 50%; box-shadow: 0 0 15px #eab308; }
+        .orbit-path { position: absolute; width: 100px; height: 100px; border: 1px dashed rgba(255,255,255,0.3); border-radius: 50%; animation: spin-anim 4s linear infinite; }
+        .orbit-path.reverse { animation: spin-anim-rev 3s linear infinite; }
+        .satellite { position: absolute; top: -5px; left: 45px; width: 10px; height: 10px; background: #38bdf8; border-radius: 50%; box-shadow: 0 0 8px #38bdf8; }
+        @keyframes spin-anim { 100% { transform: rotate(360deg); } }
+        @keyframes spin-anim-rev { 100% { transform: rotate(-360deg); } }
+
+        /* 4. Network */
+        .node-network { position: relative; width: 100px; height: 100px; }
+        .node { position: absolute; width: 12px; height: 12px; background: #a855f7; border-radius: 50%; box-shadow: 0 0 10px #a855f7; }
+        .n1 { top: 10%; left: 50%; transform: translateX(-50%); animation: pulse 1.5s infinite alternate; }
+        .n2 { top: 70%; left: 10%; animation: pulse 1.5s infinite alternate 0.5s; }
+        .n3 { top: 70%; left: 90%; animation: pulse 1.5s infinite alternate 1s; }
+        .line { position: absolute; background: rgba(168, 85, 247, 0.4); transform-origin: 0 0; }
+        .l1 { top: 15%; left: 50%; width: 2px; height: 60px; transform: rotate(40deg); }
+        .l2 { top: 15%; left: 50%; width: 2px; height: 60px; transform: rotate(-40deg); }
+        .l3 { top: 75%; left: 15%; width: 75px; height: 2px; }
+        @keyframes pulse { 0% { transform: scale(1) translateX(0); opacity: 0.5; } 100% { transform: scale(1.5) translateX(0); opacity: 1; } }
+
+        /* 5. DNA */
+        .dna-container { display: flex; flex-direction: column; gap: 8px; }
+        .dna-row { display: flex; align-items: center; justify-content: center; position: relative; width: 60px; height: 10px; }
+        .dna-dot1, .dna-dot2 { position: absolute; width: 12px; height: 12px; border-radius: 50%; }
+        .dna-dot1 { background: #ef4444; animation: dna-cross 2s infinite ease-in-out; }
+        .dna-dot2 { background: #3b82f6; animation: dna-cross-rev 2s infinite ease-in-out; }
+        .dna-line { width: 100%; height: 2px; background: rgba(255,255,255,0.2); }
+        .dna-row:nth-child(2) .dna-dot1, .dna-row:nth-child(2) .dna-dot2 { animation-delay: 0.2s; }
+        .dna-row:nth-child(3) .dna-dot1, .dna-row:nth-child(3) .dna-dot2 { animation-delay: 0.4s; }
+        .dna-row:nth-child(4) .dna-dot1, .dna-row:nth-child(4) .dna-dot2 { animation-delay: 0.6s; }
+        @keyframes dna-cross { 0% { left: 0; z-index: 2; transform: scale(1); } 50% { left: 48px; z-index: 0; transform: scale(0.6); } 100% { left: 0; z-index: 2; transform: scale(1); } }
+        @keyframes dna-cross-rev { 0% { left: 48px; z-index: 0; transform: scale(0.6); } 50% { left: 0; z-index: 2; transform: scale(1); } 100% { left: 48px; z-index: 0; transform: scale(0.6); } }
+
+        /* 6. Fusion */
+        .particle-container { position: relative; width: 100px; height: 100px; }
+        .p1, .p2 { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #f97316; box-shadow: 0 0 15px #f97316; top: 40px; }
+        .p1 { left: 0; animation: fuse1 2s infinite ease-in; }
+        .p2 { right: 0; animation: fuse2 2s infinite ease-in; }
+        .flash { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 0; height: 0; background: #fff; border-radius: 50%; opacity: 0; animation: fuse-flash 2s infinite; }
+        @keyframes fuse1 { 0% { left: 0; opacity: 1; } 45% { left: 35px; opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; left: 0; } }
+        @keyframes fuse2 { 0% { right: 0; opacity: 1; } 45% { right: 35px; opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; right: 0; } }
+        @keyframes fuse-flash { 0%, 45% { width: 0; height: 0; opacity: 0; box-shadow: 0 0 0 #fff; } 50% { width: 60px; height: 60px; opacity: 1; box-shadow: 0 0 40px 20px #fbbf24; } 100% { width: 10px; height: 10px; opacity: 0; } }
+
+        /* Floating Animation */
+        .float-anim { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
+
+    <!-- Particle Effects Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Container -->
+    <div id="app-container" class="w-full max-w-3xl min-h-[550px] glass-panel rounded-3xl p-6 md:p-12 relative flex flex-col justify-center">
+        
+        <!-- Screen 1: Start -->
+        <div id="screen-start" class="text-center w-full fade-enter">
+            <div class="mb-10">
+                <div class="inline-block p-5 rounded-3xl bg-gradient-to-br from-indigo-500/30 to-purple-500/30 mb-6 float-anim border border-indigo-400/30 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-4 tracking-tight">lnwZa Quiz</h1>
+                <p class="text-slate-300 text-lg md:text-xl max-w-md mx-auto leading-relaxed">ตะลุยโจทย์วิทย์-เทคโนโลยีอัปเดตถึงปี 2026<br>ระดับความยาก TPAT3</p>
+                <div class="mt-6 text-sm text-indigo-200/80 flex justify-center gap-6 font-medium bg-indigo-900/30 w-fit mx-auto px-6 py-2 rounded-full border border-indigo-500/20">
+                    <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg> 5 ข้อ / ฉบับ</span>
+                    <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg> สุ่มอัตโนมัติ</span>
+                </div>
+            </div>
+            <button onclick="startQuiz()" class="group relative inline-flex items-center justify-center px-10 py-4 text-xl font-bold text-white transition-all duration-200 bg-indigo-600 border border-transparent rounded-full hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.5)] hover:scale-105 hover:shadow-[0_0_30px_rgba(79,70,229,0.7)]">
+                เริ่มทำแบบทดสอบ
+                <svg class="w-6 h-6 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+        </div>
+
+        <!-- Screen 2: Quiz -->
+        <div id="screen-quiz" class="hidden w-full h-full flex-col">
+            <div id="quiz-anim-wrapper" class="w-full flex-grow flex flex-col">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-indigo-500/30">
+                    <h2 id="quiz-title" class="text-xl md:text-2xl font-bold text-indigo-300">ฉบับที่ 1</h2>
+                    <span id="question-counter" class="bg-indigo-900/50 border border-indigo-500/30 px-4 py-1.5 rounded-full text-sm font-medium text-indigo-200">ข้อ 1 / 5</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-800/80 rounded-full h-2.5 mb-6 border border-slate-700/50 overflow-hidden">
+                    <div id="progress-fill" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(99,102,241,0.8)]" style="width: 0%"></div>
+                </div>
+                
+                <!-- Question Content -->
+                <div class="flex-grow flex flex-col">
+                    <p id="question-text" class="text-lg md:text-xl mb-6 font-medium leading-relaxed min-h-[80px] text-slate-100"></p>
+                    
+                    <div id="choices-container" class="flex flex-col gap-3 md:gap-4 mb-8">
+                        <!-- Choices injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button id="btn-submit" onclick="submitAnswer()" disabled class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed disabled:shadow-none hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 text-lg shadow-[0_4px_15px_rgba(99,102,241,0.4)]">
+                ตรวจคำตอบ
+            </button>
+        </div>
+
+        <!-- Screen 3: Summary -->
+        <div id="screen-summary" class="hidden text-center w-full fade-enter">
+            <h2 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mb-2">สรุปผลคะแนน</h2>
+            <p class="text-slate-300 mb-8 text-lg">การทดสอบเสร็จสมบูรณ์</p>
+            
+            <div class="w-48 h-48 mx-auto rounded-full border-[10px] border-indigo-500 flex items-center justify-center mb-8 bg-slate-800/50 shadow-[0_0_40px_rgba(99,102,241,0.4)] backdrop-blur-sm relative">
+                <div class="absolute inset-0 rounded-full border-4 border-white/10 animate-ping opacity-20"></div>
+                <span id="final-score" class="text-6xl font-black text-white drop-shadow-lg">0/5</span>
+            </div>
+            
+            <p id="summary-feedback" class="text-2xl text-indigo-300 mb-8 font-semibold px-4">ยอดเยี่ยมมาก!</p>
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button onclick="showHistory()" class="group bg-slate-800 text-indigo-300 hover:bg-slate-700 border border-indigo-500/40 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    ดูประวัติการตอบ
+                </button>
+                <button onclick="resetApp()" class="group bg-white text-slate-900 hover:bg-indigo-50 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 group-hover:-rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    ลองเล่นฉบับอื่น
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 4: History/Review (No direct answers) -->
+        <div id="screen-history" class="hidden w-full fade-enter flex-col max-h-[70vh] overflow-hidden">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-indigo-500/30 shrink-0">
+                <h2 class="text-2xl font-bold text-indigo-300">วิเคราะห์การตอบ</h2>
+                <button onclick="backToSummary()" class="text-slate-400 hover:text-white transition-colors bg-slate-800 p-2 rounded-lg">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+            <div class="mb-4 shrink-0 text-sm text-yellow-200/80 bg-yellow-900/30 p-3 rounded-lg border border-yellow-700/50">
+                <span class="font-bold text-yellow-400">💡 เคล็ดลับ:</span> ระบบจะไม่เฉลยข้อที่ถูกต้องตรงๆ แต่จะบอกแนวคิดให้คุณนำไปวิเคราะห์เอง เพื่อความเข้าใจที่ยั่งยืน
+            </div>
+            
+            <div id="history-container" class="flex-grow overflow-y-auto pr-2 pb-4 space-y-6">
+                <!-- History Items Injected Here -->
+            </div>
+            
+            <div class="pt-4 shrink-0 border-t border-slate-700">
+                <button onclick="resetApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-colors">ทำแบบทดสอบใหม่</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal (Popup เฉลยตรงกลางจอ) -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 md:p-6 opacity-0 transition-opacity duration-300">
+        <div id="modal-content" class="bg-slate-900/95 border border-indigo-500/40 w-full max-w-lg rounded-3xl p-8 transform scale-95 transition-transform duration-300 shadow-[0_0_50px_rgba(79,70,229,0.3)] text-center flex flex-col items-center">
+            
+            <!-- Animation Container (Dynamic) -->
+            <div id="modal-animation" class="anim-container mb-6">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="mb-8 w-full">
+                <h3 id="modal-result" class="text-3xl font-black mb-4 tracking-wide">ถูกต้อง!</h3>
+                <p id="modal-explanation" class="text-slate-200 text-base md:text-lg leading-relaxed bg-slate-800/80 p-5 rounded-2xl border border-slate-700/50 text-left shadow-inner w-full inline-block"></p>
+            </div>
+
+            <button onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all hover:scale-105 text-lg shadow-[0_4px_15px_rgba(79,70,229,0.4)]">
+                ไปต่อกันเลย
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Generate Particles for Background
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            let size = Math.random() * 5 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            p.style.animationDelay = (Math.random() * 10) + 's';
+            particlesContainer.appendChild(p);
+        }
+
+        // --- ฐานข้อมูลข้อสอบ (3 ฉบับ, ฉบับละ 5 ข้อ รวม 15 ข้อ) ---
+        const allSets = [
+            // ฉบับที่ 1
+            [
+                { q: "ข้อใดคือจุดเด่นสำคัญของแบตเตอรี่แบบ Solid-state ที่คาดว่าจะนำมาใช้ในรถยนต์ไฟฟ้า (EV) อย่างแพร่หลายภายในปี 2026 แทนที่แบตเตอรี่ลิเธียมไอออนแบบเดิม?", c: ["ราคาถูกกว่าและผลิตได้เร็วกว่า", "ใช้อิเล็กโทรไลต์แบบของแข็ง ทำให้ปลอดภัยจากไฟไหม้และจุพลังงานได้มากขึ้น", "สามารถชาร์จพลังงานจากแสงอาทิตย์ได้ในตัว", "มีน้ำหนักเบาลง 90% เมื่อเทียบกับแบบเดิม", "ไม่ต้องใช้แร่ลิเธียมในการผลิตเลย"], ans: 1, exp: "Solid-state battery เปลี่ยนอิเล็กโทรไลต์จากของเหลวที่ติดไฟง่าย เป็นของแข็ง (เช่น เซรามิก) ทำให้ลดความร้อน ปลอดภัยขึ้น และมีความหนาแน่นพลังงาน (Energy Density) สูงขึ้น", anim: "battery" },
+                { q: "กล้องโทรทรรศน์อวกาศเจมส์ เว็บบ์ (JWST) ตรวจจับสิ่งใดเป็นหลัก เพื่อวิเคราะห์ชั้นบรรยากาศของดาวเคราะห์นอกระบบสุริยะ (Exoplanet) ว่าอาจมีองค์ประกอบของสิ่งมีชีวิต?", c: ["คลื่นไมโครเวฟพื้นหลัง (CMB)", "รังสีอัลตราไวโอเลต (UV)", "รังสีเอกซ์ (X-ray)", "รังสีอินฟราเรด (Infrared)", "คลื่นวิทยุ (Radio waves)"], ans: 3, exp: "JWST ถูกออกแบบมาให้รับรังสีอินฟราเรดเป็นหลัก ซึ่งสามารถทะลุทะลวงกลุ่มฝุ่นควันในอวกาศได้ดี เพื่อสแกนองค์ประกอบทางเคมีในชั้นบรรยากาศดาวเคราะห์", anim: "orbit" },
+                { q: "เทคโนโลยี CRISPR-Cas9 ที่ก้าวหน้าขึ้นจนถึงปี 2026 ถูกนำมาประยุกต์ใช้ในวงการเกษตรกรรมอย่างไรที่ส่งผลกระทบชัดเจนที่สุด?", c: ["สร้างพืชที่สังเคราะห์แสงตอนกลางคืนได้", "ตัดต่อพันธุกรรมให้พืชทนทานต่อสภาพอากาศสุดขั้วและโรคระบาดได้แม่นยำขึ้น", "เปลี่ยนพืชใบเลี้ยงเดี่ยวให้กลายเป็นพืชใบเลี้ยงคู่", "ทำให้พืชเติบโตได้โดยไม่ต้องใช้น้ำเลย", "สร้างพืชที่ปล่อยก๊าซออกซิเจนมากกว่าปกติ 100 เท่า"], ans: 1, exp: "CRISPR-Cas9 เปรียบเสมือนกรรไกรตัดต่อ DNA ที่แม่นยำ ถูกนำมาสร้างสายพันธุ์พืชที่ทนแล้ง ทนน้ำท่วม และต้านทานแมลง เพื่อรับมือกับวิกฤตสภาพภูมิอากาศ", anim: "dna" },
+                { q: "ในสถาปัตยกรรมของ Generative AI (เช่น ChatGPT) กลไกใดที่ทำให้ AI เข้าใจบริบทและความสำคัญของคำแต่ละคำในประโยคยาวๆ ได้ดีที่สุด?", c: ["Convolutional Neural Network (CNN)", "Decision Trees", "Attention Mechanism", "Blockchain Technology", "Quantum Entanglement"], ans: 2, exp: "Attention Mechanism (โดยเฉพาะใน Transformer model) เป็นกลไกที่สอนให้ AI ให้น้ำหนักความสำคัญของคำแต่ละคำที่สัมพันธ์กันในประโยค ทำให้เข้าใจบริบทได้เหมือนมนุษย์", anim: "network" },
+                { q: "Smart Grid (โครงข่ายไฟฟ้าอัจฉริยะ) แตกต่างจากระบบไฟฟ้าแบบดั้งเดิมอย่างไรในยุคเปลี่ยนผ่านพลังงาน?", c: ["ใช้สายไฟที่ทำจากทองคำเพื่อลดความต้านทาน", "ผลิตกระแสไฟฟ้าจากแรงโน้มถ่วงของโลก", "มีการสื่อสารข้อมูลสองทางระหว่างผู้ผลิตและผู้ใช้ เพื่อบริหารจัดการโหลดพลังงานหมุนเวียน", "ส่งไฟฟ้าแบบไร้สายผ่านชั้นบรรยากาศ", "ตัดการใช้พลังงานจากเชื้อเพลิงฟอสซิลได้ 100% ทันที"], ans: 2, exp: "Smart Grid ใช้เทคโนโลยี IoT สื่อสารข้อมูลสองทาง (Two-way communication) รู้ว่าตอนไหนควรเก็บไฟ หรือจ่ายไฟ ช่วยแก้ปัญหาความไม่แน่นอนของพลังงานหมุนเวียน", anim: "waves" }
+            ],
+            // ฉบับที่ 2
+            [
+                { q: "แนวคิดพื้นฐานของ Quantum Computing ที่ทำให้สามารถประมวลผลข้อมูลบางประเภทได้เร็วกว่า Supercomputer หลายล้านเท่า คือคุณสมบัติใด?", c: ["ความสามารถในการประมวลผลที่ 0 K (ศูนย์สัมบูรณ์) เท่านั้น", "Superposition (การซ้อนทับสถานะ) และ Entanglement (ความพัวพัน)", "การใช้แสงแทนกระแสไฟฟ้า 100%", "การเพิ่มจำนวนทรานซิสเตอร์ลงในชิปขนาด 1 นาโนเมตร", "การส่งข้อมูลผ่านรูหนอนจิ๋ว"], ans: 1, exp: "คิวบิต (Qubit) สามารถเป็นทั้ง 0 และ 1 พร้อมกันได้ (Superposition) และเชื่อมโยงกันได้ทันที (Entanglement) ทำให้ประมวลผลความน่าจะเป็นทั้งหมดได้พร้อมๆ กัน", anim: "orbit" },
+                { q: "เทคโนโลยีวัคซีน mRNA หลังยุคโควิด-19 ถูกเร่งพัฒนาเพื่อเป้าหมายหลักทางการแพทย์ในเรื่องใดภายในปี 2026?", c: ["วัคซีนป้องกันโรคอ้วน", "วัคซีนรักษามะเร็งเฉพาะบุคคล (Personalized Cancer Vaccines)", "วัคซีนป้องกันโรคกระดูกพรุน", "วัคซีนย้อนวัยเซลล์ประสาท", "วัคซีนป้องกันพิษสุนัขบ้าแบบกิน"], ans: 1, exp: "เทคโนโลยี mRNA ถูกนำมาพัฒนาต่อยอดเพื่อสอนระบบภูมิคุ้มกันของร่างกายมนุษย์ให้รู้จักและโจมตีเซลล์มะเร็งเฉพาะจุดของผู้ป่วยแต่ละรายอย่างเจาะจง", anim: "dna" },
+                { q: "ดาวเทียมสื่อสารวงโคจรต่ำ (LEO - Low Earth Orbit) เช่น Starlink มีข้อได้เปรียบเหนือดาวเทียมค้างฟ้า (GEO) อย่างไร?", c: ["ครอบคลุมพื้นที่ทั่วโลกด้วยดาวเทียมเพียงดวงเดียว", "มีอายุการใช้งานนานกว่า 100 ปี", "มีความหน่วงเวลา (Latency) ต่ำกว่ามาก เพราะอยู่ใกล้โลกกว่า", "ไม่ต้องใช้เสาอากาศรับสัญญาณที่พื้นดิน", "สามารถสะท้อนแสงอาทิตย์มาผลิตไฟฟ้าให้โลกได้"], ans: 2, exp: "ดาวเทียม LEO อยู่สูงจากพื้นโลกเพียง 500-2,000 กม. ทำให้สัญญาณเดินทางสั้นกว่า ความหน่วงเวลา (Ping/Latency) จึงต่ำมาก เหมาะกับการส่งข้อมูลเรียลไทม์", anim: "waves" },
+                { q: "ในปัจจุบันมีการพัฒนาวัสดุชนิดใดเพื่อใช้ดักจับ 'ไมโครพลาสติก' ในแหล่งน้ำได้อย่างมีประสิทธิภาพสูง?", c: ["แม่เหล็กกำลังสูง (Neodymium)", "นาโนเซลลูโลส หรือ ไฮโดรเจลโครงสร้างรูพรุน", "ตาข่ายที่ทำจากสายใยแก้วนำแสง", "แบคทีเรียที่ตัดต่อพันธุกรรมให้กินพลาสติกเท่านั้น", "ฟองน้ำสังเคราะห์จากปิโตรเลียม"], ans: 1, exp: "วัสดุชีวภาพอย่างเจลนาโนเซลลูโลส หรือวัสดุโครงสร้างรูพรุนระดับนาโน มีประจุไฟฟ้าที่สามารถดูดซับและดักจับอนุภาคไมโครพลาสติกขนาดจิ๋วในน้ำได้", anim: "network" },
+                { q: "เทคโนโลยี Brain-Computer Interface (BCI) เช่น Neuralink อาศัยหลักการทางฟิสิกส์และชีววิทยาใดในการทำงาน?", c: ["ตรวจจับการไหลเวียนของเลือดในสมองด้วยแสงอินฟราเรด", "วัดคลื่นเสียงที่เกิดจากการสั่นของเซลล์ประสาท", "ตรวจจับกระแสไฟฟ้าขนาดเล็ก (Action Potential) ที่ส่งระหว่างเซลล์ประสาท", "สแกนอุณหภูมิที่เปลี่ยนแปลงเมื่อสมองคิด", "การส่งผ่านสารเคมีเข้าไปในคอมพิวเตอร์"], ans: 2, exp: "เมื่อสมองสั่งการ เซลล์ประสาทจะสื่อสารกันด้วยสัญญาณไฟฟ้า (Action Potential) BCI จะอ่านสัญญาณไฟฟ้าเหล่านี้และแปลงเป็นคำสั่งคอมพิวเตอร์", anim: "battery" }
+            ],
+            // ฉบับที่ 3
+            [
+                { q: "ความสำเร็จครั้งใหญ่ของปฏิกิริยา 'นิวเคลียร์ฟิวชัน' (Nuclear Fusion) ที่ประกาศในช่วงที่ผ่านมา คือเรื่องใดที่ปูทางไปสู่พลังงานสะอาดในอนาคต?", c: ["การสร้างเตาปฏิกรณ์ที่อุณหภูมิติดลบได้สำเร็จ", "การบรรลุ 'Net Energy Gain' (ได้พลังงานออกมามากกว่าที่ใส่เข้าไป)", "การเปลี่ยนยูเรเนียมเป็นทองคำ", "การทำให้ปฏิกิริยาดำเนินต่อไปได้เองเป็นเวลา 1 ปีเต็ม", "การพบธาตุใหม่ที่เกิดจากปฏิกิริยานี้"], ans: 1, exp: "ความสำเร็จล่าสุดคือการทำ Ignition ได้สำเร็จ หมายความว่าพลังงานสุทธิที่ผลิตออกมาจากปฏิกิริยา มีปริมาณมากกว่าพลังงานเลเซอร์ที่ยิงเพื่อจุดระเบิด", anim: "fusion" },
+                { q: "เซลล์แสงอาทิตย์ชนิด 'เพอรอฟสไกต์ (Perovskite)' เป็นเทคโนโลยีที่ถูกคาดหวังมาแทนที่ซิลิคอนภายในปี 2026 เพราะเหตุใด?", c: ["ทนทานต่อการถูกหินชนได้ดีกว่าแผงทั่วไป", "ผลิตจากพลาสติกรีไซเคิล 100%", "มีน้ำหนักเบา โค้งงอได้ โปร่งแสง และราคาต้นทุนการผลิตต่ำกว่าซิลิคอน", "สามารถผลิตไฟฟ้าจากความร้อนของอากาศได้", "มีอายุการใช้งานนานกว่าซิลิคอน 10 เท่าโดยเสื่อมสภาพ 0%"], ans: 2, exp: "เพอรอฟสไกต์มีคุณสมบัติดูดซับแสงได้ดี สามารถผลิตในรูปแบบฟิล์มบาง โค้งงอได้ และใช้ต้นทุนการผลิตที่ถูกกว่าแผงซิลิคอนแบบดั้งเดิม", anim: "solar" },
+                { q: "ระบบ LIDAR ที่ใช้ในรถยนต์ไร้คนขับ (Autonomous Vehicles) ทำงานโดยใช้หลักการคล้ายคลึงกับอะไรมากที่สุด?", c: ["โซนาร์ (Sonar) ของเรือดำน้ำ แต่ใช้แสงเลเซอร์แทนคลื่นเสียง", "เรดาร์ (Radar) ของเครื่องบิน โดยใช้คลื่นวิทยุความถี่ต่ำ", "กล้องถ่ายภาพความร้อน (Thermal Camera)", "การแทรกสอดของคลื่นไมโครเวฟ", "หลักการสะท้อนกลับหมดของไฟเบอร์ออปติก"], ans: 0, exp: "LIDAR ยิงแสงเลเซอร์ออกไป แล้ววัดระยะเวลาที่แสงสะท้อนกลับมา (Time of Flight) เพื่อสร้างแผนที่ 3 มิติรอบรถ หลักการคล้ายโซนาร์ที่ใช้คลื่นเสียง", anim: "waves" },
+                { q: "เทคโนโลยี Carbon Capture and Storage (CCS) มักจะนำก๊าซคาร์บอนไดออกไซด์ที่ดักจับได้ ไปทำอะไรเพื่อไม่ให้กลับสู่ชั้นบรรยากาศ?", c: ["ปล่อยสู่อวกาศผ่านจรวดขนส่ง", "อัดฉีดลงไปเก็บในชั้นหินใต้ดินลึก หรือแหล่งน้ำมันดิบที่หมดแล้ว", "แปรสภาพเป็นก๊าซออกซิเจนด้วยรังสีแกมมา", "แช่แข็งเป็นน้ำแข็งแห้งและทิ้งลงมหาสมุทร", "ผสมกับน้ำมันเชื้อเพลิงเพื่อเพิ่มประสิทธิภาพ"], ans: 1, exp: "กระบวนการดักจับ CO2 จะทำให้อยู่ในสถานะของเหลวหรือวิกฤตยวด แล้วอัดฉีดลงไปเก็บอย่างถาวรใต้ดินในโครงสร้างทางธรณีวิทยาที่ปิดทึบ", anim: "battery" },
+                { q: "การพัฒนา AI ในการแพทย์ (Medical Imaging) มักใช้โมเดลประเภทใดในการวิเคราะห์ภาพถ่ายเอกซเรย์เพื่อค้นหาจุดผิดปกติ?", c: ["Natural Language Processing (NLP)", "Reinforcement Learning (RL)", "Convolutional Neural Network (CNN)", "Generative Adversarial Network (GAN)", "K-Means Clustering"], ans: 2, exp: "CNN เป็นโครงข่ายประสาทเทียมที่ออกแบบมาเฉพาะเพื่อเรียนรู้และสกัดลักษณะเด่น (Features) จากรูปภาพ จึงเหมาะสมที่สุดสำหรับวิเคราะห์ภาพทางการแพทย์", anim: "network" }
+            ]
+        ];
+
+        let currentSetIndex = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedChoiceIndex = null;
+        let currentSet = [];
+        let userAnswers = []; // เก็บประวัติการตอบ
+
+        // DOM Elements
+        const elStartScreen = document.getElementById('screen-start');
+        const elQuizScreen = document.getElementById('screen-quiz');
+        const elSummaryScreen = document.getElementById('screen-summary');
+        const elHistoryScreen = document.getElementById('screen-history');
+        const elQuizAnimWrapper = document.getElementById('quiz-anim-wrapper');
+        
+        const elQuizTitle = document.getElementById('quiz-title');
+        const elQuestionCounter = document.getElementById('question-counter');
+        const elQuestionText = document.getElementById('question-text');
+        const elChoicesContainer = document.getElementById('choices-container');
+        const elBtnSubmit = document.getElementById('btn-submit');
+        const elProgressFill = document.getElementById('progress-fill');
+        
+        const elModalOverlay = document.getElementById('modal-overlay');
+        const elModalContent = document.getElementById('modal-content');
+        const elModalResult = document.getElementById('modal-result');
+        const elModalExplanation = document.getElementById('modal-explanation');
+        const elModalAnimation = document.getElementById('modal-animation');
+        
+        const elFinalScore = document.getElementById('final-score');
+        const elSummaryFeedback = document.getElementById('summary-feedback');
+        const elHistoryContainer = document.getElementById('history-container');
+
+        function startQuiz() {
+            currentSetIndex = Math.floor(Math.random() * allSets.length);
+            currentSet = allSets[currentSetIndex];
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedChoiceIndex = null;
+            userAnswers = []; // Reset ประวัติ
+
+            elStartScreen.classList.add('hidden');
+            elQuizScreen.classList.remove('hidden');
+            elQuizScreen.classList.add('flex');
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            // Trigger Animation
+            elQuizAnimWrapper.classList.remove('fade-enter');
+            void elQuizAnimWrapper.offsetWidth; // trigger reflow
+            elQuizAnimWrapper.classList.add('fade-enter');
+
+            const qData = currentSet[currentQuestionIndex];
+            selectedChoiceIndex = null;
+            elBtnSubmit.disabled = true;
+
+            const progressPercent = (currentQuestionIndex / currentSet.length) * 100;
+            elProgressFill.style.width = `${progressPercent}%`;
+
+            elQuizTitle.innerText = `ฉบับที่ ${currentSetIndex + 1}`;
+            elQuestionCounter.innerText = `ข้อ ${currentQuestionIndex + 1} / 5`;
+            elQuestionText.innerText = qData.q;
+
+            elChoicesContainer.innerHTML = '';
+            qData.c.forEach((choiceText, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn w-full text-left p-4 md:p-5 rounded-2xl text-slate-200 font-medium md:text-lg flex items-start gap-3';
+                btn.innerHTML = `<span class="inline-flex items-center justify-center min-w-[28px] h-7 rounded-full bg-indigo-900/50 border border-indigo-500/30 text-indigo-300 font-bold text-sm">${index + 1}</span> <span>${choiceText}</span>`;
+                btn.onclick = () => selectChoice(index, btn);
+                elChoicesContainer.appendChild(btn);
+            });
+        }
+
+        function selectChoice(index, btnElement) {
+            selectedChoiceIndex = index;
+            elBtnSubmit.disabled = false;
+            const allBtns = elChoicesContainer.querySelectorAll('.choice-btn');
+            allBtns.forEach(btn => btn.classList.remove('selected'));
+            btnElement.classList.add('selected');
+        }
+
+        function submitAnswer() {
+            if (selectedChoiceIndex === null) return;
+
+            const qData = currentSet[currentQuestionIndex];
+            const isCorrect = (selectedChoiceIndex === qData.ans);
+
+            if (isCorrect) score++;
+
+            // บันทึกประวัติการตอบ
+            userAnswers.push({
+                selected: selectedChoiceIndex,
+                isCorrect: isCorrect
+            });
+
+            showExplanationModal(isCorrect, qData.exp, qData.anim);
+        }
+
+        function showExplanationModal(isCorrect, explanation, animType) {
+            if (isCorrect) {
+                elModalResult.innerText = "🎉 ถูกต้อง!";
+                elModalResult.className = "text-3xl font-black mb-3 tracking-wide text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]";
+            } else {
+                elModalResult.innerText = "💥 ยังไม่ถูกนะ";
+                elModalResult.className = "text-3xl font-black mb-3 tracking-wide text-rose-400 drop-shadow-[0_0_10px_rgba(251,113,133,0.5)]";
+            }
+            elModalExplanation.innerText = explanation;
+            elModalAnimation.innerHTML = getAnimationHTML(animType);
+
+            elModalOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                elModalOverlay.classList.remove('opacity-0');
+                elModalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function getAnimationHTML(type) {
+            switch(type) {
+                case 'waves': return `<div class="wave"></div><div class="wave"></div><div class="wave"></div>`;
+                case 'battery': return `<div class="battery-body"><div class="battery-fill"></div></div>`;
+                case 'orbit': return `<div class="orbit-center"></div><div class="orbit-path"><div class="satellite"></div></div><div class="orbit-path reverse" style="width:70px; height:70px;"><div class="satellite" style="background:#ef4444"></div></div>`;
+                case 'network': return `<div class="node-network"><div class="line l1"></div><div class="line l2"></div><div class="line l3"></div><div class="node n1"></div><div class="node n2"></div><div class="node n3"></div></div>`;
+                case 'dna': return `<div class="dna-container"><div class="dna-row"><div class="dna-line"></div><div class="dna-dot1"></div><div class="dna-dot2"></div></div><div class="dna-row"><div class="dna-line"></div><div class="dna-dot1"></div><div class="dna-dot2"></div></div><div class="dna-row"><div class="dna-line"></div><div class="dna-dot1"></div><div class="dna-dot2"></div></div><div class="dna-row"><div class="dna-line"></div><div class="dna-dot1"></div><div class="dna-dot2"></div></div></div>`;
+                case 'fusion': return `<div class="particle-container"><div class="p1"></div><div class="p2"></div><div class="flash"></div></div>`;
+                case 'solar': return `<div class="wave" style="border-radius:0; height:2px; background:#eab308; width:60px; transform-origin: left; transform: rotate(45deg);"></div><div style="width:60px;height:40px; background:#1e3a8a; border:2px solid #3b82f6; position:absolute; bottom:20px;"></div>`;
+                default: return `<div class="wave"></div>`;
+            }
+        }
+
+        function nextQuestion() {
+            elModalOverlay.classList.add('opacity-0');
+            elModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                elModalOverlay.classList.add('hidden');
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentSet.length) {
+                    renderQuestion();
+                } else {
+                    showSummary();
+                }
+            }, 300);
+        }
+
+        function showSummary() {
+            elQuizScreen.classList.add('hidden');
+            elQuizScreen.classList.remove('flex');
+            elProgressFill.style.width = '100%';
+            
+            elSummaryScreen.classList.remove('hidden');
+            elFinalScore.innerText = `${score}/5`;
+            elFinalScore.className = "text-6xl font-black text-white drop-shadow-lg"; 
+            
+            if (score === 5) {
+                elSummaryFeedback.innerText = "ระดับ lnwZa ของจริง! พร้อมลุย TPAT3 🚀";
+                elFinalScore.classList.add('text-green-400');
+            } else if (score >= 3) {
+                elSummaryFeedback.innerText = "ทำได้ดีมาก! ทบทวนอีกนิดก็ Perfect 💡";
+                elFinalScore.classList.add('text-yellow-400');
+            } else {
+                elSummaryFeedback.innerText = "พยายามต่อไปนะ ความรู้ใหม่ๆ ต้องใช้เวลาเรียนรู้ 📚";
+                elFinalScore.classList.add('text-rose-400');
+            }
+        }
+
+        function showHistory() {
+            elSummaryScreen.classList.add('hidden');
+            elHistoryScreen.classList.remove('hidden');
+            elHistoryScreen.classList.add('flex');
+            
+            elHistoryContainer.innerHTML = '';
+            
+            // สร้างประวัติการตอบ โดยไม่บอกข้อถูกตรงๆ เพื่อให้คิดวิเคราะห์
+            userAnswers.forEach((ans, idx) => {
+                const qData = currentSet[idx];
+                const choiceText = qData.c[ans.selected];
+                
+                const historyCard = document.createElement('div');
+                historyCard.className = `p-5 bg-slate-800/80 border ${ans.isCorrect ? 'border-green-500/40' : 'border-rose-500/40'} rounded-2xl`;
+                
+                historyCard.innerHTML = `
+                    <p class="font-bold text-slate-100 mb-3 leading-relaxed">ข้อ ${idx + 1}: ${qData.q}</p>
+                    <div class="mb-3 p-3 rounded-xl font-medium ${ans.isCorrect ? 'bg-green-900/20 text-green-300' : 'bg-rose-900/20 text-rose-300'}">
+                        คุณตอบ: ${choiceText} <span class="float-right text-lg">${ans.isCorrect ? '✅' : '❌'}</span>
+                    </div>
+                    <div class="p-4 bg-indigo-950/50 border border-indigo-500/20 rounded-xl text-indigo-200 text-sm md:text-base leading-relaxed">
+                        <span class="font-bold text-indigo-400 block mb-1">💡 แนวคิด / หลักการที่เกี่ยวข้อง:</span>
+                        ${qData.exp}
+                    </div>
+                `;
+                elHistoryContainer.appendChild(historyCard);
+            });
+        }
+
+        function backToSummary() {
+            elHistoryScreen.classList.add('hidden');
+            elHistoryScreen.classList.remove('flex');
+            elSummaryScreen.classList.remove('hidden');
+        }
+
+        function resetApp() {
+            elSummaryScreen.classList.add('hidden');
+            elHistoryScreen.classList.add('hidden');
+            elHistoryScreen.classList.remove('flex');
+            elStartScreen.classList.remove('hidden');
+            elProgressFill.style.width = '0%';
+        }
+
+    </script>
+</body>
+</html>
